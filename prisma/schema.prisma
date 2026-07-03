@@ -1,0 +1,49 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id          String              @id @default(uuid())
+  email       String              @unique
+  name        String?
+  avatarUrl   String?
+  createdAt   DateTime            @default(now())
+  generations ContentGeneration[]
+  themes      Theme[]
+}
+
+model Theme {
+  id              String   @id @default(uuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id])
+  name            String
+  layoutType      String   // e.g. "classic", "listicle"
+  backgroundColor String
+  textColor       String
+  accentColor     String
+  isDefault       Boolean  @default(false)
+  generations     ContentGeneration[]
+  createdAt       DateTime @default(now())
+}
+
+model ContentGeneration {
+  id             String   @id @default(uuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id])
+  themeId        String?
+  theme          Theme?   @relation(fields: [themeId], references: [id])
+  niche          String
+  topic          String
+  title          String
+  description    String
+  hashtags       String
+  cta            String
+  suggestedBoard String
+  futureTopics   String[] 
+  listItems      Json?    // Stores array of objects: { title, description, icon }
+  createdAt      DateTime @default(now())
+}
